@@ -7,6 +7,7 @@
 **How to use this fork**: https://grll.bearblog.dev/use-claude-github-actions-with-claude-max/
 
 A general-purpose [Claude Code](https://claude.ai/code) action for GitHub PRs and issues that can answer questions and implement code changes. This action listens for a trigger phrase in comments and activates Claude act on the request. It supports multiple authentication methods including:
+
 - **OAuth authentication for Claude Max subscribers** (new in this fork)
 - Anthropic direct API
 - Amazon Bedrock
@@ -102,33 +103,34 @@ jobs:
           claude_access_token: ${{ secrets.CLAUDE_ACCESS_TOKEN }}
           claude_refresh_token: ${{ secrets.CLAUDE_REFRESH_TOKEN }}
           claude_expires_at: ${{ secrets.CLAUDE_EXPIRES_AT }}
-          
+
           timeout_minutes: "60"
 ```
 
 ## Inputs
 
-| Input                 | Description                                                                                                          | Required | Default   |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
-| `anthropic_api_key`   | Anthropic API key (required for direct API, not needed for Bedrock/Vertex/OAuth)                                     | No\*     | -         |
-| `use_oauth`           | Use Claude AI OAuth authentication instead of API key (for Claude Max subscribers)                                   | No       | `false`   |
-| `claude_access_token` | Claude AI OAuth access token (required when use_oauth is true)                                                       | No       | -         |
-| `claude_refresh_token`| Claude AI OAuth refresh token (required when use_oauth is true)                                                      | No       | -         |
-| `claude_expires_at`   | Claude AI OAuth token expiration timestamp (required when use_oauth is true)                                         | No       | -         |
-| `direct_prompt`       | Direct prompt for Claude to execute automatically without needing a trigger (for automated workflows)                | No       | -         |
-| `timeout_minutes`     | Timeout in minutes for execution                                                                                     | No       | `30`      |
-| `github_token`        | GitHub token for Claude to operate with. **Only include this if you're connecting a custom GitHub app of your own!** | No       | -         |
-| `model`               | Model to use (provider-specific format required for Bedrock/Vertex)                                                  | No       | -         |
-| `anthropic_model`     | **DEPRECATED**: Use `model` instead. Kept for backward compatibility.                                                | No       | -         |
-| `use_bedrock`         | Use Amazon Bedrock with OIDC authentication instead of direct Anthropic API                                          | No       | `false`   |
-| `use_vertex`          | Use Google Vertex AI with OIDC authentication instead of direct Anthropic API                                        | No       | `false`   |
-| `allowed_tools`       | Additional tools for Claude to use (the base GitHub tools will always be included)                                   | No       | ""        |
-| `disallowed_tools`    | Tools that Claude should never use                                                                                   | No       | ""        |
-| `custom_instructions` | Additional custom instructions to include in the prompt for Claude                                                   | No       | ""        |
-| `mcp_config`          | Additional MCP configuration (JSON string) that merges with the built-in GitHub MCP servers                          | No       | ""        |
-| `assignee_trigger`    | The assignee username that triggers the action (e.g. @claude). Only used for issue assignment                        | No       | -         |
-| `trigger_phrase`      | The trigger phrase to look for in comments, issue/PR bodies, and issue titles                                        | No       | `@claude` |
-| `claude_env`          | Custom environment variables to pass to Claude Code execution (YAML format)                                          | No       | ""        |
+| Input                          | Description                                                                                                                        | Required | Default   |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- | -------- | --------- |
+| `anthropic_api_key`            | Anthropic API key (required for direct API, not needed for Bedrock/Vertex/OAuth)                                                   | No\*     | -         |
+| `use_oauth`                    | Use Claude AI OAuth authentication instead of API key (for Claude Max subscribers)                                                 | No       | `false`   |
+| `claude_access_token`          | Claude AI OAuth access token (required when use_oauth is true)                                                                     | No       | -         |
+| `claude_refresh_token`         | Claude AI OAuth refresh token (required when use_oauth is true)                                                                    | No       | -         |
+| `claude_expires_at`            | Claude AI OAuth token expiration timestamp (required when use_oauth is true)                                                       | No       | -         |
+| `direct_prompt`                | Direct prompt for Claude to execute automatically without needing a trigger (for automated workflows)                              | No       | -         |
+| `timeout_minutes`              | Timeout in minutes for execution                                                                                                   | No       | `30`      |
+| `github_token`                 | GitHub token for Claude to operate with. **Only include this if you're connecting a custom GitHub app of your own!**               | No       | -         |
+| `model`                        | Model to use (provider-specific format required for Bedrock/Vertex)                                                                | No       | -         |
+| `anthropic_model`              | **DEPRECATED**: Use `model` instead. Kept for backward compatibility.                                                              | No       | -         |
+| `use_bedrock`                  | Use Amazon Bedrock with OIDC authentication instead of direct Anthropic API                                                        | No       | `false`   |
+| `use_vertex`                   | Use Google Vertex AI with OIDC authentication instead of direct Anthropic API                                                      | No       | `false`   |
+| `allowed_tools`                | Additional tools for Claude to use (the base GitHub tools will always be included)                                                 | No       | ""        |
+| `disallowed_tools`             | Tools that Claude should never use                                                                                                 | No       | ""        |
+| `custom_instructions`          | Additional custom instructions to include in the prompt for Claude                                                                 | No       | ""        |
+| `mcp_config`                   | Additional MCP configuration (JSON string) that merges with the built-in GitHub MCP servers                                        | No       | ""        |
+| `assignee_trigger`             | The assignee username that triggers the action (e.g. @claude). Only used for issue assignment                                      | No       | -         |
+| `trigger_phrase`               | The trigger phrase to look for in comments, issue/PR bodies, and issue titles                                                      | No       | `@claude` |
+| `claude_env`                   | Custom environment variables to pass to Claude Code execution (YAML format)                                                        | No       | ""        |
+| `dangerously_skip_permissions` | **⚠️ DANGEROUS**: Skip all permission checks. This bypasses security safeguards and should only be used when absolutely necessary. | No       | `false`   |
 
 \*Required when using direct Anthropic API (default and when not using Bedrock, Vertex, or OAuth)
 
@@ -263,7 +265,7 @@ on:
       - "src/api/**/*.ts"
 
 steps:
-  - uses: grll/claude-code-action@beta  # Fork with OAuth support
+  - uses: grll/claude-code-action@beta # Fork with OAuth support
     with:
       direct_prompt: |
         Update the API documentation in README.md to reflect
@@ -287,7 +289,7 @@ jobs:
       github.event.pull_request.user.login == 'developer1' ||
       github.event.pull_request.user.login == 'external-contributor'
     steps:
-      - uses: grll/claude-code-action@beta  # Fork with OAuth support
+      - uses: grll/claude-code-action@beta # Fork with OAuth support
         with:
           direct_prompt: |
             Please provide a thorough review of this pull request.
@@ -362,7 +364,7 @@ Claude does **not** have access to execute arbitrary Bash commands by default. I
 **Note**: If your repository has a `.mcp.json` file in the root directory, Claude will automatically detect and use the MCP server tools defined there. However, these tools still need to be explicitly allowed via the `allowed_tools` configuration.
 
 ```yaml
-- uses: grll/claude-code-action@beta  # Fork with OAuth support
+- uses: grll/claude-code-action@beta # Fork with OAuth support
   with:
     allowed_tools: "Bash(npm install),Bash(npm run test),Edit,Replace,NotebookEditCell"
     disallowed_tools: "TaskOutput,KillTask"
@@ -376,7 +378,7 @@ Claude does **not** have access to execute arbitrary Bash commands by default. I
 Use a specific Claude model:
 
 ```yaml
-- uses: grll/claude-code-action@beta  # Fork with OAuth support
+- uses: grll/claude-code-action@beta # Fork with OAuth support
   with:
     # model: "claude-3-5-sonnet-20241022"  # Optional: specify a different model
     # ... other inputs
@@ -405,7 +407,7 @@ Use provider-specific model names based on your chosen provider:
 
 ```yaml
 # For direct Anthropic API (default)
-- uses: grll/claude-code-action@beta  # Fork with OAuth support
+- uses: grll/claude-code-action@beta # Fork with OAuth support
   with:
     anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
     # ... other inputs
@@ -453,7 +455,7 @@ Both AWS Bedrock and GCP Vertex AI require OIDC authentication.
     app-id: ${{ secrets.APP_ID }}
     private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-- uses: grll/claude-code-action@beta  # Fork with OAuth support
+- uses: grll/claude-code-action@beta # Fork with OAuth support
   with:
     model: "anthropic.claude-3-7-sonnet-20250219-beta:0"
     use_bedrock: "true"
@@ -478,7 +480,7 @@ Both AWS Bedrock and GCP Vertex AI require OIDC authentication.
     app-id: ${{ secrets.APP_ID }}
     private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-- uses: grll/claude-code-action@beta  # Fork with OAuth support
+- uses: grll/claude-code-action@beta # Fork with OAuth support
   with:
     model: "claude-3-7-sonnet@20250219"
     use_vertex: "true"
@@ -497,6 +499,37 @@ Both AWS Bedrock and GCP Vertex AI require OIDC authentication.
 - **Token Permissions**: The GitHub app receives only a short-lived token scoped specifically to the repository it's operating in
 - **No Cross-Repository Access**: Each action invocation is limited to the repository where it was triggered
 - **Limited Scope**: The token cannot access other repositories or perform actions beyond the configured permissions
+
+### ⚠️ Dangerous Permission Bypass (YOLO Mode)
+
+**WARNING: Only use this in controlled environments where you understand the security implications.**
+
+The `dangerously_skip_permissions` input allows you to bypass the normal permission checks that ensure only users with write access can trigger Claude. This is sometimes necessary in specific workflow configurations or when testing.
+
+```yaml
+- uses: grll/claude-code-action@beta
+  with:
+    dangerously_skip_permissions: "true" # ⚠️ DANGER: Skips all permission checks
+    # ... other inputs
+```
+
+**When this is enabled:**
+
+- ✅ Claude will execute even if the triggering user lacks write permissions
+- ❌ Any user with read access could potentially trigger Claude
+- ❌ This bypasses important security safeguards
+
+**Use this option only when:**
+
+- Testing in a private repository
+- Working in a controlled environment where all users are trusted
+- Dealing with permission edge cases in your specific workflow configuration
+
+**Never use this in:**
+
+- Public repositories
+- Production environments with external contributors
+- Repositories with sensitive data or credentials
 
 ### GitHub App Permissions
 

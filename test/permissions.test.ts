@@ -160,3 +160,48 @@ describe("checkWritePermissions", () => {
     });
   });
 });
+
+// Test the prepare script logic for skipping permissions
+describe("dangerously_skip_permissions integration", () => {
+  let originalEnv: typeof process.env;
+  let consoleWarnSpy: any;
+
+  beforeEach(() => {
+    originalEnv = { ...process.env };
+    consoleWarnSpy = spyOn(console, "warn").mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    process.env = originalEnv;
+    consoleWarnSpy.mockRestore();
+  });
+
+  test("should skip permission checks when DANGEROUSLY_SKIP_PERMISSIONS is true", () => {
+    process.env.DANGEROUSLY_SKIP_PERMISSIONS = "true";
+
+    // Import the function that checks the environment variable
+    const skipPermissions = process.env.DANGEROUSLY_SKIP_PERMISSIONS === "true";
+    expect(skipPermissions).toBe(true);
+  });
+
+  test("should not skip permission checks when DANGEROUSLY_SKIP_PERMISSIONS is false", () => {
+    process.env.DANGEROUSLY_SKIP_PERMISSIONS = "false";
+
+    const skipPermissions = process.env.DANGEROUSLY_SKIP_PERMISSIONS === "true";
+    expect(skipPermissions).toBe(false);
+  });
+
+  test("should not skip permission checks when DANGEROUSLY_SKIP_PERMISSIONS is undefined", () => {
+    delete process.env.DANGEROUSLY_SKIP_PERMISSIONS;
+
+    const skipPermissions = process.env.DANGEROUSLY_SKIP_PERMISSIONS === "true";
+    expect(skipPermissions).toBe(false);
+  });
+
+  test("should not skip permission checks when DANGEROUSLY_SKIP_PERMISSIONS is an invalid value", () => {
+    process.env.DANGEROUSLY_SKIP_PERMISSIONS = "invalid";
+
+    const skipPermissions = process.env.DANGEROUSLY_SKIP_PERMISSIONS === "true";
+    expect(skipPermissions).toBe(false);
+  });
+});

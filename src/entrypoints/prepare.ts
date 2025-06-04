@@ -28,15 +28,22 @@ async function run() {
     // Step 2: Parse GitHub context (once for all operations)
     const context = parseGitHubContext();
 
-    // Step 3: Check write permissions
-    const hasWritePermissions = await checkWritePermissions(
-      octokit.rest,
-      context,
-    );
-    if (!hasWritePermissions) {
-      throw new Error(
-        "Actor does not have write permissions to the repository",
+    // Step 3: Check write permissions (unless dangerously skipped)
+    const skipPermissions = process.env.DANGEROUSLY_SKIP_PERMISSIONS === "true";
+    if (skipPermissions) {
+      console.warn(
+        "⚠️  DANGER: Skipping permission checks due to dangerously_skip_permissions=true",
       );
+    } else {
+      const hasWritePermissions = await checkWritePermissions(
+        octokit.rest,
+        context,
+      );
+      if (!hasWritePermissions) {
+        throw new Error(
+          "Actor does not have write permissions to the repository",
+        );
+      }
     }
 
     // Step 4: Check trigger conditions
